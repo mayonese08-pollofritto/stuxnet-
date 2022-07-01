@@ -1,0 +1,46 @@
+Checks windows version, if major version 5 then extract:
+
+
+Search for .stub section:
+
+10001199   loc_10001199:
+10001199       push 0x100032B8 // .stub
+1000119E       push edi
+1000119F       call dword ptr [0x10003010] // __imp_KERNEL32.dll!lstrcmpiA[7C80B929]
+100011A5   loc_100011A5:
+100011A5       test eax,eax
+100011A7       je 0x100011BB? // loc_100011BB
+
+
+Validate .stub section size and first 4 bytes
+
+100011BB   loc_100011BB:
+100011BB       mov ecx,dword ptr [edi+0x8]
+100011BE       cmp ecx,0x0000022C
+100011C4       jb 0x100011B5? // loc_100011B5
+100011C6   loc_100011C6:
+100011C6       mov eax,dword ptr [edi+0xC]
+100011C9       add eax,dword ptr [0x1000401C] // IMAGEBASE_data_1000401C
+100011CF       cmp dword ptr [eax],0xAE39120D
+100011D5       jne 0x100011B5? // loc_100011B5
+
+.stub section contains embedded exe with partially masked MZ header:
+
+10006000 :     0D 12 39 AE 28 02 00 00 00 9A 07 00 28 9C 07 00 ..9.(.......(...
+10006010 :     5A 00 00 00 82 9C 07 00 F3 1C 00 00 00 00 00 00 Z...............
+10006020 :     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+10006030 :     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+10006040 :     F0 00 00 00 0E 1F BA 0E 00 B4 09 CD 21 B8 01 4C ............!..L
+10006050 :     CD                                              .
+10006051   ASCII: !This program cannot be run in DOS mode....
+10006051 :     21 54 68 69 73 20 70 72 6F 67 72 61 6D 20 63 61 !This program ca
+10006061 :     6E 6E 6F 74 20 62 65 20 72 75 6E 20 69 6E 20 44 nnot be run in D
+10006071 :     4F 53 20 6D 6F 64 65 2E 0D 0D 0A 24 00 00 00 00 OS mode....$....
+10006081 :     00 00 00 A9 74 04 F3 ED 15 6A A0 ED 15 6A A0 ED ....t....j...j..
+10006091 :     15 6A A0 E4 6D FF A0 EC 15 6A A0 E4 6D E9 A0 EF .j..m....j..m...
+100060A1 :     15 6A A0 CA D3 11 A0 E8 15 6A A0 ED 15 6B A0 F8 .j.......j...k..
+100060B1 :     15 6A A0 CA D3 17 A0 EC 15 6A A0 E4 6D E3 A0 EF .j.......j..m...
+100060C1 :     15 6A A0 E4 6D F8 A0 EC 15 6A A0 E4 6D FB A0 EC .j..m....j..m...
+100060D1 :     15 6A A0 52 69 63 68 ED 15 6A A0 00 00 00 00 00 .j.Rich..j......
+100060E1 :     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+100060F1 :     00 00 00 50 45 00 00 4C 01 05 00 23 56 8B 4B 00 ...PE..L...#V.K.
